@@ -1,0 +1,95 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test Case 1 - less than 7 days
+      id: test-case-1-less-than-7-days
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test Case 1 - less than 7 days
+        setup-command: javac Main.java
+        command: java Main
+        input: '5'
+        expected-output: |-
+          Weeks=0
+          Days Left Over=5
+        comparison-method: exact
+        timeout: 10
+        max-score: 1
+    - name: Test Case 2 - 7 days
+      id: test-case-2-7-days
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test Case 2 - 7 days
+        setup-command: ''
+        command: java Main
+        input: '7'
+        expected-output: |-
+          Weeks=1
+          Days Left Over=0
+        comparison-method: exact
+        timeout: 10
+        max-score: 1
+    - name: Test Case 3 - more than 7 days
+      id: test-case-3-more-than-7-days
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test Case 3 - more than 7 days
+        setup-command: ''
+        command: java Main
+        input: '10'
+        expected-output: |-
+          Weeks=1
+          Days Left Over=3
+        comparison-method: exact
+        timeout: 10
+        max-score: 1
+    - name: Test Case 4 - 14 days
+      id: test-case-4-14-days
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test Case 4 - 14 days
+        setup-command: ''
+        command: java Main
+        input: '14'
+        expected-output: |-
+          Weeks=2
+          Days Left Over=0
+        comparison-method: exact
+        timeout: 10
+        max-score: 1
+    - name: Test Case 5 - more than 14 days
+      id: test-case-5-more-than-14-days
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test Case 5 - more than 14 days
+        setup-command: ''
+        command: java Main
+        input: '20'
+        expected-output: |-
+          Weeks=2
+          Days Left Over=6
+        comparison-method: exact
+        timeout: 10
+        max-score: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST-CASE-1-LESS-THAN-7-DAYS_RESULTS: "${{steps.test-case-1-less-than-7-days.outputs.result}}"
+        TEST-CASE-2-7-DAYS_RESULTS: "${{steps.test-case-2-7-days.outputs.result}}"
+        TEST-CASE-3-MORE-THAN-7-DAYS_RESULTS: "${{steps.test-case-3-more-than-7-days.outputs.result}}"
+        TEST-CASE-4-14-DAYS_RESULTS: "${{steps.test-case-4-14-days.outputs.result}}"
+        TEST-CASE-5-MORE-THAN-14-DAYS_RESULTS: "${{steps.test-case-5-more-than-14-days.outputs.result}}"
+      with:
+        runners: test-case-1-less-than-7-days,test-case-2-7-days,test-case-3-more-than-7-days,test-case-4-14-days,test-case-5-more-than-14-days
